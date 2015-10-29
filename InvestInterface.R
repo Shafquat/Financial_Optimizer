@@ -12,7 +12,7 @@ library(shiny)
 ui <- fluidPage(
 	# *Input() functions
 	sliderInput(inputId = "num", label = "Choose a number", value = 50, min = 1, max = 100),
-	radioButtons(inputId = "model", label = "Choose an optimization model", choices = c("MAD" = "MAD","MVO" = "MVO"),
+	radioButtons(inputId = "model", label = "Choose an optimization model", choices = c("MAD" = "MAD","MVO" = "MVO")),
 	
 	# *output() functions
 	plotOutput(outputId = "hist")	
@@ -27,6 +27,7 @@ server <- function(input, output) {
 	hist(rnorm(input$num))
   })
 }
+
 
 #call shiny app
 shinyApp(ui = ui, server = server)
