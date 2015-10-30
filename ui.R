@@ -17,9 +17,10 @@ shinyUI(pageWithSidebar(
 
     helpText("Please select stocks for your portfolio"),
 
-    textInputRow("symb", "", "FB"),
-    textInputRow("symb1", "", "F"),
-    textInputRow("symb2", "", "TSLA"),
+    textInputRow("symb1", "", "FB"),
+    textInputRow("symb2", "", "F"),
+    textInputRow("symb3", "", "TSLA"),
+    uiOutput("newrow"),
     
     actionButton("addmore", "Add more stocks"),
     

@@ -1,6 +1,13 @@
 library(shiny)
 library(quantmod)
 
+textInputRow<-function (inputId, label, value = "") 
+{
+  div(style="display:inline-block",
+      tags$label(label, 'for' = inputId), 
+      tags$input(id = inputId, type = "text", value = value,class="input-small"))
+}
+
 # Define server logic for random distribution application
 shinyServer(function(input, output) {
   
@@ -10,7 +17,7 @@ shinyServer(function(input, output) {
       return(NULL)
     
     return(isolate({
-      getSymbols(input$symb,src="yahoo", auto.assign = FALSE)
+      getSymbols(input$symb1,src="yahoo", auto.assign = FALSE)
     }))
   })
   
@@ -38,12 +45,18 @@ shinyServer(function(input, output) {
     seq(span[1], span[2], by = diff(span) / 100)
   })
   
+  # Add new text inputs
+  observeEvent(input$addmore,{
+    output$newrow <- renderUI({
+      textInputRow("symb4", "", "")})
+  })
+
+  
+  
   # tab based controls
   output$newBox <- renderUI({
     switch(input$tab,
-           "Charts" = chartControls,
-           "Model" = modelControls,
-           "VaR" = helpText("VaR")
+           "Charts" = chartControls
     )
   })
   
@@ -52,29 +65,14 @@ shinyServer(function(input, output) {
     wellPanel(
       selectInput("chart_type",
                   label = "Chart type",
-                  choices = c("Candlestick" = "candlesticks", 
-                              "Matchstick" = "matchsticks",
-                              "Bar" = "bars",
+                  choices = c("Bar" = "bars",
                               "Line" = "line"),
                   selected = "Line"
-      ),
-      checkboxInput(inputId = "log_y", label = "log y axis", 
-                    value = FALSE)
+      )
     ),
     
     wellPanel(
       p(strong("Technical Analysis")),
-      checkboxInput("ta_vol", label = "Volume", value = FALSE),
-      checkboxInput("ta_sma", label = "Simple Moving Average", 
-                    value = FALSE),
-      checkboxInput("ta_ema", label = "Exponential Moving Average", 
-                    value = FALSE),
-      checkboxInput("ta_wma", label = "Weighted Moving Average", 
-                    value = FALSE),
-      checkboxInput("ta_bb", label = "Bolinger Bands", 
-                    value = FALSE),
-      checkboxInput("ta_momentum", label = "Momentum", 
-                    value = FALSE),
       
       br(),
       
@@ -88,8 +86,6 @@ shinyServer(function(input, output) {
     
     tas <- isolate({c(input$ta_vol, input$ta_sma, input$ta_ema, 
                       input$ta_wma,input$ta_bb, input$ta_momentum)})
-    funcs <- c(addVo(), addSMA(), addEMA(), addWMA(), 
-               addBBands(), addMomentum())
     
     if (any(tas)) funcs[tas]
     else "NULL"
@@ -97,10 +93,9 @@ shinyServer(function(input, output) {
   
   output$chart <- renderPlot({
     chartSeries(dataInput(),
-                name = input$symb,
+                name = input$symb1,
                 type = input$chart_type,
                 subset = datesInput(),
-                log.scale = input$log_y,
                 theme = "white",
                 TA = TAInput())
   })
