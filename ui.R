@@ -26,7 +26,7 @@ shinyUI(pageWithSidebar(
     
     dateRangeInput("dates", 
                    "Please select the historic range of returns",
-                   start = "2013-01-01", end = "2014-09-05"),
+                   start = Sys.Date()-365, end = Sys.Date()),
     
     actionButton("get", "Optimize!"),
     br(),
