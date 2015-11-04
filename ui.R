@@ -39,9 +39,7 @@ shinyUI(pageWithSidebar(
   # Show a tabset that includes a plot, summary, and table view
   # of the generated distribution
   mainPanel(
-    tabsetPanel(
-      tabPanel("Charts", plotOutput("chart")), 
-      id = "tab"
-    )
+    plotOutput("plot1", click = "plot_click"),
+    verbatimTextOutput("info")
   )
 ))
