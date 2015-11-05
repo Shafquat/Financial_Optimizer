@@ -20,28 +20,33 @@ shinyServer(function(input, output) {
   # Add one new text input THIS NEEDS TO BE RECURRING
   observeEvent(input$addmore,{
     output$newrow <- renderUI({
-      textInputRow("symb4", "", "")})
+      textInputRow("symb10", "", "")})
   })
   
   #Stock Input Procedure NOT SURE IF THIS WORKS... Hardcoded
   #ticker = c(input$symb1, input$symb2, input$symb3)
   
+  # when button click, retrieves stock information
   dataInput <- reactive({
+    if (input$get == 0)
+      return(NULL)
+
+    return(isolate({
     getSymbols(input$symb1, src = 'yahoo', 
                 from = input$dates[1], 
                 to = input$dates[2], 
                 auto.assign = FALSE)
+    }))
   })
   
+  
+  # outputs a chart
   output$plot1 <- renderPlot({    
     chartSeries(dataInput(), theme = chartTheme("white"), 
-                type = "line", log.scale = input$log, TA = NULL)
+                type = "line", TA = NULL)
   })
+  
+  # gives coordinates on chart
   output$info <- renderText({
-    if (input$get == 0)
-      return(NULL)
-    
-    return(isolate({
-    paste0("Expected Return =", input$plot_click$x, "\nVariance =", input$plot_click$y)}))
-  })
+    paste0("Expected Return: ", input$plot_click$x, "\nVariance: ", input$plot_click$y)})
 })
