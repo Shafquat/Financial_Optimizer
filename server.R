@@ -24,13 +24,16 @@ shinyServer(function(input, output) {
   })
   
   #Stock Input Procedure NOT SURE IF THIS WORKS... Hardcoded
-  #ticker = c(input$symb1, input$symb2, input$symb3)
+  ticker <- reactive({
+      c(input$symb1, input$symb2, input$symb3, input$symb4, input$symb5, input$symb6,
+        input$symb7, input$symb8, input$symb9, input$symb10)
+  })
   
   # when button click, retrieves stock information
   dataInput <- reactive({
     if (input$get == 0)
       return(NULL)
-
+    
     return(isolate({
     getSymbols(input$symb1, src = 'yahoo', 
                 from = input$dates[1], 
@@ -38,7 +41,6 @@ shinyServer(function(input, output) {
                 auto.assign = FALSE)
     }))
   })
-  
   
   # outputs a chart
   output$plot1 <- renderPlot({    
