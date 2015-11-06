@@ -53,11 +53,14 @@ shinyServer(function(input, output, session) {
     return (list(data1,data2,data3,data4,data5)) 
       
   })
-  
-  # outputs a chart
-  output$plot1 <- renderPlot({    
-    chartSeries(list_of_stocks()[[1]], name = input$symb1, theme = chartTheme("white"), 
-                type = "line", TA = NULL)
+  observeEvent(input$get,{
+    # outputs a chart
+    output$plot1 <- renderPlot({
+      # wait until optimize button is pressed
+      
+      chartSeries(list_of_stocks()[[1]], name = input$symb1, theme = chartTheme("white"), 
+                  type = "line", TA = NULL)
+    })
   })
   
   # gives coordinates on chart
