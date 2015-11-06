@@ -12,11 +12,6 @@ textInputRow<-function (inputId, label, value = "")
 # Define server logic for random distribution application
 shinyServer(function(input, output) {
   
-  # Output of a plot
-  #output$plot1 <- renderPlot({
-  #  plot(mtcars$wt, mtcars$mpg)
-  #})
-  
   # Add one new text input THIS NEEDS TO BE RECURRING
   observeEvent(input$addmore,{
     output$newrow <- renderUI({
@@ -29,18 +24,26 @@ shinyServer(function(input, output) {
         input$symb7, input$symb8, input$symb9, input$symb10)
   })
   
+  
   # when button click, retrieves stock information
   dataInput <- reactive({
+    # wait until optimize button is pressed
     if (input$get == 0)
       return(NULL)
     
-    return(isolate({
-    getSymbols(input$symb1, src = 'yahoo', 
-                from = input$dates[1], 
-                to = input$dates[2], 
-                auto.assign = FALSE)
-    }))
+    result=list()
+    data = getSymbols(input$symb1, src="yahoo",
+                      from = input$dates[1],
+                      to = input$dates[2],
+                      auto.assign = FALSE)
+    
+    result$data = data
+    return(data)
+      
+      
   })
+  
+  output$table <- renderDataTable(dataInput())
   
   # outputs a chart
   output$plot1 <- renderPlot({    
