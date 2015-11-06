@@ -10,7 +10,13 @@ textInputRow<-function (inputId, label, value = "")
 }
 
 # Define server logic for random distribution application
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
+  
+  # Change default value of minimum portfolio to -1 if shorting is selected
+  observe({
+    c_box <- input$short
+    updateNumericInput(session,"min_portfolio",value = (c_box %% 2)*-1)
+  })
   
   # Add one new text input THIS NEEDS TO BE RECURRING
   observeEvent(input$addmore,{
@@ -19,7 +25,7 @@ shinyServer(function(input, output) {
   })
   
   # when button click, retrieves stock information
-  dataInput <- reactive({
+  list_of_stocks <- reactive({
     # wait until optimize button is pressed
     if (input$get == 0)
       return(NULL)
@@ -48,11 +54,9 @@ shinyServer(function(input, output) {
       
   })
   
-  output$table <- renderDataTable(dataInput())
-  
   # outputs a chart
   output$plot1 <- renderPlot({    
-    chartSeries(dataInput()[[1]], name = input$symb1, theme = chartTheme("white"), 
+    chartSeries(list_of_stocks()[[1]], name = input$symb1, theme = chartTheme("white"), 
                 type = "line", TA = NULL)
   })
   
