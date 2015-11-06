@@ -15,15 +15,8 @@ shinyServer(function(input, output) {
   # Add one new text input THIS NEEDS TO BE RECURRING
   observeEvent(input$addmore,{
     output$newrow <- renderUI({
-      textInputRow("symb10", "", "")})
+      textInputRow("symb5", "", "")})
   })
-  
-  #Stock Input Procedure NOT SURE IF THIS WORKS... Hardcoded
-  ticker <- reactive({
-      c(input$symb1, input$symb2, input$symb3, input$symb4, input$symb5, input$symb6,
-        input$symb7, input$symb8, input$symb9, input$symb10)
-  })
-  
   
   # when button click, retrieves stock information
   dataInput <- reactive({
@@ -31,15 +24,27 @@ shinyServer(function(input, output) {
     if (input$get == 0)
       return(NULL)
     
-    result=list()
-    data = getSymbols(input$symb1, src="yahoo",
-                      from = input$dates[1],
-                      to = input$dates[2],
-                      auto.assign = FALSE)
-    
-    result$data = data
-    return(data)
-      
+    data1 <- getSymbols(input$symb1, src = "yahoo",      #Seperated the data into two seperate data sets and set auto.assign=FALSE
+                        from = input$dates[1],
+                        to = input$dates[2],
+                        auto.assign = FALSE)
+    data2 <- getSymbols(input$symb2, src = "yahoo",     #Seperated the data into two seperate data sets and set auto.assign=FALSE
+                        from = input$dates[1],
+                        to = input$dates[2],
+                        auto.assign = FALSE)
+    data3 <- getSymbols(input$symb3, src = "yahoo",      #Seperated the data into two seperate data sets and set auto.assign=FALSE
+                        from = input$dates[1],
+                        to = input$dates[2],
+                        auto.assign = FALSE)
+    data4 <- getSymbols(input$symb4, src = "yahoo",     #Seperated the data into two seperate data sets and set auto.assign=FALSE
+                        from = input$dates[1],
+                        to = input$dates[2],
+                        auto.assign = FALSE)
+    data5 <- getSymbols(input$symb5, src = "yahoo",     #Seperated the data into two seperate data sets and set auto.assign=FALSE
+                        from = input$dates[1],
+                        to = input$dates[2],
+                        auto.assign = FALSE)
+    return (list(data1,data2,data3,data4,data5)) 
       
   })
   
@@ -47,7 +52,7 @@ shinyServer(function(input, output) {
   
   # outputs a chart
   output$plot1 <- renderPlot({    
-    chartSeries(dataInput(), theme = chartTheme("white"), 
+    chartSeries(dataInput()[[1]], name = input$symb1, theme = chartTheme("white"), 
                 type = "line", TA = NULL)
   })
   

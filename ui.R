@@ -21,11 +21,6 @@ shinyUI(pageWithSidebar(
     textInputRow("symb2", "", "F"),
     textInputRow("symb3", "", "TSLA"),
     textInputRow("symb4", ""),
-    textInputRow("symb5", ""),
-    textInputRow("symb6", ""),
-    textInputRow("symb7", ""),
-    textInputRow("symb8", ""),
-    textInputRow("symb9", ""),
     uiOutput("newrow"),
     
     actionButton("addmore", "Add more stocks"),
@@ -46,9 +41,7 @@ shinyUI(pageWithSidebar(
   # of the generated distribution
   mainPanel(
     plotOutput("plot1", click = "plot_click"),
-    verbatimTextOutput("info"),
-    column(11,
-           dataTableOutput('table')
+    verbatimTextOutput("info")
     )
   )
-))
+)
