@@ -30,35 +30,20 @@ shinyServer(function(input, output, session) {
   })
   
   
-  
+
   # when button click, retrieves stock information
   list_of_stocks <- reactive({
     # wait until optimize button is pressed
     if (input$get == 0)
       return(NULL)
-    
-    data1 <- getSymbols(input$symb1, src = "yahoo",      #Seperated the data into two seperate data sets and set auto.assign=FALSE
-                        from = input$dates[1],
-                        to = input$dates[2],
-                        auto.assign = FALSE)
-    data2 <- getSymbols(input$symb2, src = "yahoo",     #Seperated the data into two seperate data sets and set auto.assign=FALSE
-                        from = input$dates[1],
-                        to = input$dates[2],
-                        auto.assign = FALSE)
-    data3 <- getSymbols(input$symb3, src = "yahoo",      #Seperated the data into two seperate data sets and set auto.assign=FALSE
-                        from = input$dates[1],
-                        to = input$dates[2],
-                        auto.assign = FALSE)
-    data4 <- getSymbols(input$symb4, src = "yahoo",     #Seperated the data into two seperate data sets and set auto.assign=FALSE
-                        from = input$dates[1],
-                        to = input$dates[2],
-                        auto.assign = FALSE)
-    data5 <- getSymbols(input$symb5, src = "yahoo",     #Seperated the data into two seperate data sets and set auto.assign=FALSE
-                        from = input$dates[1],
-                        to = input$dates[2],
-                        auto.assign = FALSE)
-    return (list(data1,data2,data3,data4,data5)) 
-      
+    stock_list = c()
+    for(i in input$morestocks+4){
+      stock_list[[length(stock_list)+1]] <- paste0("input$data", i)
+    }
+    stock_data <- getSymbols(stock_list, src = "yahoo",      #Seperated the data into two seperate data sets and set auto.assign=FALSE
+                                    from = input$dates[1],
+                                    to = input$dates[2])
+    return (stock_data) 
   })
   observeEvent(input$get,{
     # outputs a chart
