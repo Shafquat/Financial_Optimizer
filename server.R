@@ -35,23 +35,22 @@ shinyServer(function(input, output, session) {
   list_of_stocks <- observeEvent(input$get, {
     observe({
       num_stocks <- input$morestocks
-      # Enter atleast one stock into the list 
-      stock_list2 = c(input[[paste0("symb", 1)]])
+      # Enter atleast one stock into the list or else ask user to input a stock
+      stock_list2 <- c(input[[paste0("symb", 1)]])
       # Iterate over the rest of the stocks and add them to the list if they are not empty
       lapply(2:(num_stocks+4), function(i){
         if (input[[paste0("symb", i)]] != ""){
-          print(input[[paste0("symb", i)]])
-          # ************this is not working...*************
-          stock_list2 <- c(stock_list2,input[[paste0("symb", i)]])
+          # Store value in previously declared list outside the lappy func using "<<-"
+          stock_list2[[length(stock_list2)+1]] <<- input[[paste0("symb", i)]]
         }
       })
-      print(stock_list2)
       return(stock_list2)
     })
   })
   
   observeEvent(input$get,{
     # Call the respective model function ***ANDREW***
+    # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
     
     # outputs a chart
     output$plot1 <- renderPlot({
