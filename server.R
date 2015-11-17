@@ -31,26 +31,33 @@ shinyServer(function(input, output, session) {
   
   
 
-  # when button click, retrieves stock information
-  list_of_stocks <- reactive({
-    # wait until optimize button is pressed
-    if (input$get == 0)
-      return(NULL)
-    stock_list = c()
-    for(i in input$morestocks+4){
-      stock_list[[length(stock_list)+1]] <- paste0("input$data", i)
-    }
-    stock_data <- getSymbols(stock_list, src = "yahoo",      #Seperated the data into two seperate data sets and set auto.assign=FALSE
-                                    from = input$dates[1],
-                                    to = input$dates[2])
-    return (stock_data) 
+  # when button click, collate a list of stocks
+  list_of_stocks <- observeEvent(input$get, {
+    observe({
+      num_stocks <- input$morestocks
+      # Enter atleast one stock into the list 
+      stock_list2 = c(input[[paste0("symb", 1)]])
+      # Iterate over the rest of the stocks and add them to the list if they are not empty
+      lapply(2:(num_stocks+4), function(i){
+        if (input[[paste0("symb", i)]] != ""){
+          print(input[[paste0("symb", i)]])
+          # ************this is not working...*************
+          stock_list2 <- c(stock_list2,input[[paste0("symb", i)]])
+        }
+      })
+      print(stock_list2)
+      return(stock_list2)
+    })
   })
+  
   observeEvent(input$get,{
+    # Call the respective model function ***ANDREW***
+    
     # outputs a chart
     output$plot1 <- renderPlot({
       # wait until optimize button is pressed
       
-      chartSeries(list_of_stocks()[[1]], name = input$symb1, theme = chartTheme("white"), 
+      chartSeries(LISTOFSTOCKS, name = input$symb1, theme = chartTheme("white"), 
                   type = "line", TA = NULL)
     })
   })
