@@ -21,9 +21,8 @@ shinyUI(pageWithSidebar(
     textInputRow("symb2", "", "F"),
     textInputRow("symb3", "", "TSLA"),
     textInputRow("symb4", ""),
+    numericInput("morestocks","# of stocks to add","1",min = 1),
     uiOutput("newrow"),
-    
-    actionButton("addmore", "Add more stocks"),
     
     dateRangeInput("dates", 
                    "Please select the historic range of returns",

@@ -18,11 +18,18 @@ shinyServer(function(input, output, session) {
     updateNumericInput(session,"min_portfolio",value = (c_box %% 2)*-1)
   })
   
-  # Add one new text input THIS NEEDS TO BE RECURRING
-  observeEvent(input$addmore,{
+  # Change default value of minimum portfolio to -1 if shorting is selected
+  observe({
+    num_stocks <- input$morestocks
     output$newrow <- renderUI({
-      textInputRow("symb5", "", "")})
+    lapply(5:(num_stocks+4), function(i){
+      textInputRow(inputId = paste0("symb", i),"","")
+    }
+           )
+    })
   })
+  
+  
   
   # when button click, retrieves stock information
   list_of_stocks <- reactive({
