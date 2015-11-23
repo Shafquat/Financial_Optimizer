@@ -46,12 +46,12 @@ shinyServer(function(input, output, session) {
   })
   
   # wait until optimize button is pressed
-  observeEvent(input$get,{
-    
+  observeEvent(input$get, {
     #download data from yahoo finance
-    mylist <- lapply(list_of_stocks, function(x){
+    mylist <- reactive({lapply(list_of_stocks, function(x){
       try(getSymbols(x, src = 'yahoo', from = input$start, to = input$end, auto.assign = FALSE))
     })
+      })
     
     # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
     folio <- MVO(ticker = list_of_stocks, mylist = mylist, wmax = 1, nports = 20, shorts = TRUE, rf = input$riskfree_rate)
@@ -61,6 +61,9 @@ shinyServer(function(input, output, session) {
       plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
     })
   })
+  
+
+
   
   # gives coordinates on chart
   output$info <- renderText({
