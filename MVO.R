@@ -46,7 +46,7 @@ MVO <- function(ticker, mylist, wmax, nports, shorts, rf){
       vol[k] = sqrt(as.vector(port.sol$pw %*% rcov %*% port.sol$pw)) #caclulate volatility
       ret[k] = averet %*% port.sol$pw #calculate returns
       names(port.sol$pw)<-ticker
-      port.sol$pw <- round(100*folio$pw)/100
+      port.sol$pw <- round(100*port.sol$pw)/100
       wts[[k]] = port.sol$pw #store weights
     }
   }

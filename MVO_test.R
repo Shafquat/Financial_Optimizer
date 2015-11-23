@@ -1,4 +1,4 @@
-source("C:\\Users\\David\\Documents\\Repos\\esc499-capstone-design\\MVO.R")
+source("MVO.R")
 ticker <- c("XIU.TO","RY.TO","F")
 from = as.Date('2013-10-01')
 to = Sys.Date()
