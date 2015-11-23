@@ -17,19 +17,16 @@ shinyServer(function(input, output, session) {
     c_box <- input$short
     updateNumericInput(session,"min_portfolio",value = (c_box %% 2)*-1)
   })
-  
+
   # Change default value of minimum portfolio to -1 if shorting is selected
   observe({
     num_stocks <- input$morestocks
     output$newrow <- renderUI({
-    lapply(5:(num_stocks+4), function(i){
-      textInputRow(inputId = paste0("symb", i),"","")
-    }
-           )
+      lapply(5:(num_stocks+4), function(i){
+        textInputRow(inputId = paste0("symb", i),"","")
+      })
     })
   })
-  
-  
 
   # when button click, collate a list of stocks
   list_of_stocks <- observeEvent(input$get, {
@@ -48,16 +45,20 @@ shinyServer(function(input, output, session) {
     })
   })
   
+  # wait until optimize button is pressed
   observeEvent(input$get,{
-    # Call the respective model function ***ANDREW***
+    
+    #download data from yahoo finance
+    mylist <- lapply(list_of_stocks, function(x){
+      try(getSymbols(x, src = 'yahoo', from = input$start, to = input$end, auto.assign = FALSE))
+    })
+    
     # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
+    folio <- MVO(ticker = list_of_stocks, mylist = mylist, wmax = 1, nports = 20, shorts = TRUE, rf = input$riskfree_rate)
     
     # outputs a chart
     output$plot1 <- renderPlot({
-      # wait until optimize button is pressed
-      
-      chartSeries(LISTOFSTOCKS, name = input$symb1, theme = chartTheme("white"), 
-                  type = "line", TA = NULL)
+      plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
     })
   })
   
