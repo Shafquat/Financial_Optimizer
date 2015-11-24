@@ -1,5 +1,6 @@
 library(shiny)
 library(quantmod)
+source("MVO.R")
 
 # CSS for Stock Rows
 textInputRow<-function (inputId, label, value = "") 
@@ -29,7 +30,7 @@ shinyServer(function(input, output, session) {
   })
 
   # when button click, collate a list of stocks
-  list_of_stocks <- observeEvent(input$get, {
+  observeEvent(input$get, {
     observe({
       num_stocks <- input$morestocks
       # Enter atleast one stock into the list or else ask user to input a stock
@@ -41,29 +42,23 @@ shinyServer(function(input, output, session) {
           stock_list2[[length(stock_list2)+1]] <<- input[[paste0("symb", i)]]
         }
       })
-      return(stock_list2)
-    })
-  })
-  
-  # wait until optimize button is pressed
-  observeEvent(input$get, {
-    #download data from yahoo finance
-    mylist <- reactive({lapply(list_of_stocks, function(x){
-      try(getSymbols(x, src = 'yahoo', from = input$start, to = input$end, auto.assign = FALSE))
-    })
+
+      #download data from yahoo finance
+      reactive({
+        mylist <- lapply(stock_list2, function(x){
+          try(getSymbols(x, src = 'yahoo', from = input$start, to = input$end, auto.assign = FALSE))
+        })
       })
-    
-    # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
-    folio <- MVO(ticker = list_of_stocks, mylist = mylist, wmax = 1, nports = 20, shorts = TRUE, rf = input$riskfree_rate)
-    
-    # outputs a chart
-    output$plot1 <- renderPlot({
-      plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
+
+      # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
+      folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = 1, nports = 20, shorts = TRUE, rf = input$riskfree_rate)
+
+      # outputs a chart
+      output$plot1 <- renderPlot({
+        plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
+      })
     })
   })
-  
-
-
   
   # gives coordinates on chart
   output$info <- renderText({
