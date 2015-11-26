@@ -2,7 +2,7 @@ library(shiny)
 library(quantmod)
 source("MVO.R")
 require(tseries)
-library(fBasics)
+library(fPortfolio)
 
 # CSS for Stock Rows
 textInputRow<-function (inputId, label, value = "") 
@@ -63,12 +63,19 @@ shinyServer(function(input, output, session) {
         plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
       })
       
-      # Take weight outputs and turn them into a dataframe to display under plot
-      X <- t(data.frame(mapply(c,folio$ret,folio$weights,SIMPLIFY = FALSE)))
-      colnames(X)[1] <- "Returns"
+      # Get Investment amount from weights
+      folio$weights <- folio$weights * input$investment_amount
+      # Add the Returns to the weights
+      X <- (data.frame(folio$ret,folio$weights))
+      # Rename the headers of the first two columns of the data frame
+      colnames(X)[1] <- "Expected Return"
+      # Round all the values in X to 4 digits beyond decimal
+      is.num <- sapply(X, is.numeric)
+      X[is.num] <- lapply(X[is.num], round, 4)
+      # Create a table for weights
       output$mytable1 <- renderDataTable({
         X
-        })
+      })
     })
   })
   

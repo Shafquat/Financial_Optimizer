@@ -28,6 +28,7 @@ shinyUI(pageWithSidebar(
                    "Please select the historic range of returns",
                    start = Sys.Date()-365, end = Sys.Date()),
     
+    numericInput("investment_amount","Please enter Amount of currency you will be investing", 10000, step = 1000, min = 0),
     numericInput("riskfree_rate","Please enter the current risk free rate",0.05, step = 0.01),
     checkboxInput("short","Allow shorting",FALSE),
     numericInput("min_portfolio","Minimum weight amount per stock",0, step = 0.01, min = -1, max = 1),
