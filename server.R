@@ -61,10 +61,19 @@ shinyServer(function(input, output, session) {
       output$plot1 <- renderPlot({
         plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
       })
+      
+      # Take weight outputs and turn them into a dataframe to display under plot
+      X <- t(data.frame(mapply(c,folio$ret,folio$weights,SIMPLIFY = FALSE)))
+      colnames(X)[1] <- "Returns"
+      output$mytable1 <- renderDataTable({
+        X
+        })
     })
   })
   
   # gives coordinates on chart
   output$info <- renderText({
     paste0("Variance:", input$plot_click$x, "\nExpected Return:", input$plot_click$y)})
+  
+
 })
