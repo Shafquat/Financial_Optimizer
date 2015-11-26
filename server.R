@@ -30,10 +30,15 @@ shinyServer(function(input, output, session) {
     })
   })
 
+  # get number of new stocks when button is pressed
+  num_stocks_caller <- eventReactive(input$get, {
+    input$morestocks
+  })
+
   # when button click, collate a list of stocks
   observeEvent(input$get, {
     observe({
-      num_stocks <- input$morestocks
+      num_stocks <- num_stocks_caller()
       # Enter atleast one stock into the list or else ask user to input a stock
       stock_list2 <- c(input[[paste0("symb", 1)]])
       # Iterate over the rest of the stocks and add them to the list if they are not empty
