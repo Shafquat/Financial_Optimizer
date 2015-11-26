@@ -44,10 +44,8 @@ shinyServer(function(input, output, session) {
       })
 
       #download data from yahoo finance
-      reactive({
-        mylist <- lapply(stock_list2, function(x){
-          try(getSymbols(x, src = 'yahoo', from = input$start, to = input$end, auto.assign = FALSE))
-        })
+      mylist <- lapply(stock_list2, function(x){
+        try(getSymbols(x, src = 'yahoo', from = input$dates[1], to = input$dates[2], auto.assign = FALSE))
       })
 
       # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
