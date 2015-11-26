@@ -31,7 +31,7 @@ MAD <- function(mylist, ticker, shorts, nports, rf, wmax){
   
   #convert constraints to be handled properly by porfolioFrontier()
   ifelse(shorts, wmin <- -wmax, wmin <- 0)
-  constraints <- c(paste("minW[1:n.assets]=",wmin),paste("maxW[1:n.assets]=",wmax))
+  constraints <- c(paste("minW[1:",n.assets,"]=",wmin),paste("maxW[1:",n.assets,"]=",wmax))
   
   #optimize, without shortselling
   frontier <- portfolioFrontier(data = as.timeSeries(r), spec = frontierSpec, constraints=constraints);
