@@ -34,7 +34,8 @@ MVO <- function(ticker, mylist, wmax, nports, shorts, rf){
   min.rets = seq(mnret, mxret, len = nports)
   vol = rep(NA, nports)
   ret = rep(NA, nports)
-  wts = list()
+  wts = matrix(data = NA, nrow = nports, ncol = n.assets)
+  colnames(wts) <- ticker
   for (k in 1:nports)
   {
     port.sol = NULL
@@ -46,7 +47,7 @@ MVO <- function(ticker, mylist, wmax, nports, shorts, rf){
       ret[k] = averet %*% port.sol$pw #calculate returns
       names(port.sol$pw)<-ticker
       port.sol$pw <- round(100*port.sol$pw)/100
-      wts[[k]] = port.sol$pw #store weights
+      wts[k,] = port.sol$pw #store weights
     }
   }
   

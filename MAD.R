@@ -1,6 +1,6 @@
 #load library fPortfolio
 require(fPortfolio)
-#packages.install("fPortfolio")
+install.packages("fPortfolio")
 #library(fPortfolio)
 
 
@@ -31,8 +31,13 @@ MAD <- function(mylist, ticker){
   #optimize, without shortselling
   frontier <- portfolioFrontier(data = as.timeSeries(r), spec = frontierSpec, constraints="LongOnly");
   
+  vol <- getTargetRisk(frontier)[,2]
+  ret <- getTargetReturn(frontier)[,2]
+  wts <- getWeights(frontier)
+  return(list(vol = vol, ret = ret, weights = wts))
+  
   #build efficient frontier graph
-  tailoredFrontierPlot(object=frontier,mText="MAD Frontier (Long only)",risk="CVaR");
-  weightedReturnsPlot(frontier)
+  #tailoredFrontierPlot(object=frontier,mText="MAD Frontier (Long only)",risk="CVaR");
+  #weightedReturnsPlot(frontier)
   
 }
