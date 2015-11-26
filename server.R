@@ -50,7 +50,7 @@ shinyServer(function(input, output, session) {
       })
 
       # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
-      folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = 1, nports = 20, shorts = TRUE, rf = input$riskfree_rate)
+      folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = 1, nports = 20, shorts = input$short, rf = input$riskfree_rate)
 
       # outputs a chart
       output$plot1 <- renderPlot({
