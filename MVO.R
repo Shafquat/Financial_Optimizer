@@ -1,56 +1,47 @@
+#load library fPortfolio
+require(fPortfolio)
+require(Rglpk)
 require(tseries)
 require(quantmod)
-require(corpcor)
-require(Matrix)
+#install.packages("fPortfolio")
+#library(fPortfolio)
 
-#if you don't have one of the above packages, use install.packages("packagename")
-MVO <- function(ticker, mylist, wmax, nports, shorts, rf){
+
+MVO <- function(mylist, ticker, shorts, nports, rf, wmax){
   
   for(i in 1:length(mylist)){
     mylist[[i]] <- mylist[[i]][index(mylist[[1]])]
   }
   
-  r<-na.remove(do.call(merge,lapply(lapply(mylist,Ad),annualReturn))) #extract adjusted close daily returns
+  r<-na.remove(do.call(merge,lapply(lapply(mylist,Ad),monthlyReturn))) #extract adjusted close annual returns
+  names(r) <- ticker
+  n.assets <- length(mylist)
 
-  averet = vector()
-  #calculate geometric mean and store in averet
-  for (i in 1:length(ticker)){
-    averet[i] <- prod((1+r[1:length(r[,1]),i]))^(1/length(r[,1]))-1
-  }
+  #create portfolio specification
+  frontierSpec  <- portfolioSpec();
   
-  averet <- matrix(averet, nrow=1)
-  rcov <- as.matrix(nearPD(cov(r))$mat)
+  #optimization criteria - MVO
+  setType(frontierSpec)  <- "MVO"
   
-  mxret = max(abs(averet))
-  mnret = -mxret
-  n.assets = ncol(averet)
-  reshigh = rep(wmax,n.assets)
-  if( shorts )
-  {
-    reslow = rep(-wmax,n.assets)
-  } else {
-    reslow = rep(0,n.assets)
-  }
-  min.rets = seq(mnret, mxret, len = nports)
-  vol = rep(NA, nports)
-  ret = rep(NA, nports)
-  wts = matrix(data = NA, nrow = nports, ncol = n.assets)
-  colnames(wts) <- ticker
-  for (k in 1:nports)
-  {
-    port.sol = NULL
-    try(port.sol <- portfolio.optim(x=averet, pm=min.rets[k], covmat=rcov,
-                                    reshigh=reshigh, reslow=reslow,shorts=shorts,riskless = TRUE, rf = rf),silent=FALSE)
-    if ( !is.null(port.sol) )
-    {
-      vol[k] = sqrt(as.vector(port.sol$pw %*% rcov %*% port.sol$pw)) #caclulate volatility
-      ret[k] = averet %*% port.sol$pw #calculate returns
-      names(port.sol$pw)<-ticker
-      port.sol$pw <- round(100*port.sol$pw)/100
-      wts[k,] = port.sol$pw #store weights
-    }
-  }
+  #set optimization algorithm
+  setSolver(frontierSpec)  <- "solveRquadprog"
   
+  #set risk free rate
+  setRiskFreeRate(frontierSpec) <- rf
+  
+  #number of portfolios in efficient frontier
+  setNFrontierPoints(frontierSpec)  <- nports
+  
+  #convert constraints to be handled properly by porfolioFrontier()
+  ifelse(shorts, wmin <- -wmax, wmin <- 0)
+  constraints <- c(paste("minW[1:n.assets]=",wmin),paste("maxW[1:n.assets]=",wmax))
+  
+  #optimize, without shortselling
+  frontier <- portfolioFrontier(data = as.timeSeries(r), spec = frontierSpec, constraints=constraints);
+  
+  vol <- getTargetRisk(frontier)[,2]
+  ret <- getTargetReturn(frontier)[,2]
+  wts <- getWeights(frontier)
   return(list(vol = vol, ret = ret, weights = wts))
-
+  
 }
