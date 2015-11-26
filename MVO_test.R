@@ -9,3 +9,4 @@ mylist <- lapply(ticker, function(x){
 })
 
 folio <- MVO(ticker = ticker, mylist = mylist, wmax = 1, nports = 20, shorts = TRUE, rf = 0.01)
+
