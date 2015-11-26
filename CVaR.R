@@ -1,38 +1,50 @@
+#load library fPortfolio
+require(fPortfolio)
+require(Rglpk)
 require(tseries)
 require(quantmod)
-require(corpcor)
-require(Rglpk)
+#install.packages("fPortfolio")
+#library(fPortfolio)
 
-#if you don't have one of the above packages, use install.packages("packagename")
-CVaR <- function(mylist, alpha, rmin, wmin, wmax, weight.sum)
-{
-  require(Rglpk)
+
+CVaR <- function(mylist, ticker, shorts, nports, rf, wmax, alpha){
+  
   for(i in 1:length(mylist)){
     mylist[[i]] <- mylist[[i]][index(mylist[[1]])]
   }
   
-  r<-na.remove(do.call(merge,lapply(lapply(mylist,Ad),annualReturn))) #extract adjusted close daily returns
+  r<-na.remove(do.call(merge,lapply(lapply(mylist,Ad),monthlyReturn))) #extract adjusted close annual returns
+  names(r) <- ticker
+  n.assets <- length(mylist)
+
+  #create portfolio specification
+  frontierSpec  <- portfolioSpec();
   
-  n = ncol(r) # number of assets
-  s = nrow(r) # number of scenarios i.e. periods
-  averet = vector()
-  #calculate geometric mean and store in averet
-  for (i in 1:length(ticker)){
-    averet[i] <- prod((1+r[1:length(r[,1]),i]))^(1/length(r[,1]))-1
-  }
-  r <- matrix(r, nrow = s, ncol = n)
-  # creat objective vector, constraint matrix, constraint rhs
-  Amat = rbind(cbind(rbind(1,averet),matrix(data=0,nrow=2,ncol=s+1)),cbind(r,diag(s),1))
-  objL = c(rep(0,n), rep(-1/(alpha*s), s), -1)
-  bvec = c(weight.sum,rmin,rep(0,s))
-  # direction vector
-  dir.vec = c("==",">=",rep(">=",s))
-  # bounds on weights
-  bounds = list(lower = list(ind = 1:n, val = rep(wmin,n)),
-                upper = list(ind = 1:n, val = rep(wmax,n)))
-  res = Rglpk_solve_LP(obj=objL, mat=Amat, dir=dir.vec, rhs=bvec,
-                       types=rep("C",length(objL)), max=T, bounds=bounds)
-  w = as.numeric(res$solution[1:n])
-  return(list(w=w,status=res$status))
+  #optimization criteria - CVaR
+  setType(frontierSpec)  <- "CVAR"
   
-  }
+  #set optimization algorithm
+  setSolver(frontierSpec)  <- "solveRglpk.CVAR"
+  
+  #set alpha
+  setAlpha(frontierSpec) <- alpha
+  
+  #set risk free rate
+  setRiskFreeRate(frontierSpec) <- rf
+  
+  #number of portfolios in efficient frontier
+  setNFrontierPoints(frontierSpec)  <- nports
+  
+  #convert constraints to be handled properly by porfolioFrontier()
+  ifelse(shorts, wmin <- -wmax, wmin <- 0)
+  constraints <- c(paste("minW[1:n.assets]=",wmin),paste("maxW[1:n.assets]=",wmax))
+  
+  #optimize, without shortselling
+  frontier <- portfolioFrontier(data = as.timeSeries(r), spec = frontierSpec, constraints=constraints);
+  
+  vol <- getTargetRisk(frontier)[,2]
+  ret <- getTargetReturn(frontier)[,2]
+  wts <- getWeights(frontier)
+  return(list(vol = vol, ret = ret, weights = wts))
+  
+}
