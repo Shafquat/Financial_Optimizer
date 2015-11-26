@@ -1,6 +1,7 @@
 library(shiny)
 library(quantmod)
 source("MVO.R")
+require(tseries)
 
 # CSS for Stock Rows
 textInputRow<-function (inputId, label, value = "") 
@@ -60,5 +61,5 @@ shinyServer(function(input, output, session) {
   
   # gives coordinates on chart
   output$info <- renderText({
-    paste0("Expected Return: ", input$plot_click$x, "\nVariance: ", input$plot_click$y)})
+    paste0("Variance:", input$plot_click$x, "\nExpected Return:", input$plot_click$y)})
 })
