@@ -2,6 +2,7 @@ library(shiny)
 library(quantmod)
 source("MVO.R")
 require(tseries)
+library(fBasics)
 
 # CSS for Stock Rows
 textInputRow<-function (inputId, label, value = "") 
