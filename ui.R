@@ -46,8 +46,7 @@ shinyUI(pageWithSidebar(
   # of the generated distribution
   mainPanel(
     plotOutput("plot1", click = "plot_click"),
-    verbatimTextOutput("info"),
-    dataTableOutput("mytable1")
+    verbatimTextOutput("info")
     )
   )
 )

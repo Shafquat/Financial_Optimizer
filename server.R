@@ -72,16 +72,23 @@ shinyServer(function(input, output, session) {
       # Round all the values in X to 4 digits beyond decimal
       is.num <- sapply(X, is.numeric)
       X[is.num] <- lapply(X[is.num], round, 4)
-      # Create a table for weights
-      output$mytable1 <- renderDataTable({
-        X
-      })
+
+      # gives coordinates on chart
+      output$info <- renderText({
+        
+        min_distance <- (which(abs(X[1]-input$plot_click$y)==min(abs(X[1]-input$plot_click$y))))
+        # Return the Variance on plot and the closest value to Expected Return Possible
+        original_string <- paste0("Variance:", input$plot_click$x, 
+                                  "\nExpected Return:", X[[min_distance,1]],
+                                  "\n" )
+        for(i in 2:(ncol(X))){
+          original_string <- paste0(original_string,colnames(X)[i], ": ", X[[min_distance, i]],"\n")
+        }
+        original_string
     })
   })
   
-  # gives coordinates on chart
-  output$info <- renderText({
-    paste0("Variance:", input$plot_click$x, "\nExpected Return:", input$plot_click$y)})
+})
   
 
 })
