@@ -78,7 +78,7 @@ shinyServer(function(input, output, session) {
         
         min_distance <- (which(abs(X[1]-input$plot_click$y)==min(abs(X[1]-input$plot_click$y))))
         # Return the Variance on plot and the closest value to Expected Return Possible
-        original_string <- paste0("Variance:", input$plot_click$x, 
+        original_string <- paste0("Variance:", lapply(input$plot_click$x, round, 4), 
                                   "\nExpected Return:", X[[min_distance,1]],
                                   "\n" )
         for(i in 2:(ncol(X))){
