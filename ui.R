@@ -13,7 +13,7 @@ shinyUI(pageWithSidebar(
   headerPanel("Stock Optimization"),
   
   sidebarPanel(
-    radioButtons(inputId = "model", label = "Choose an optimization model", choices = c("MVO" = "MVO","MAD" = "MAD","Black Litterman" = "BL","CVAR" = "CVaR"), inline = TRUE),
+    radioButtons(inputId = "model", label = "Choose an optimization model", choices = c("MVO" = "MVO","MAD" = "MAD","CVAR" = "CVaR"), inline = TRUE),
 
     helpText("Please select stocks for your portfolio"),
 
