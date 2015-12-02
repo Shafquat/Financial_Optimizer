@@ -75,6 +75,10 @@ shinyServer(function(input, output, session) {
 
       # gives coordinates on chart
       output$info <- renderText({
+        if (length(input$plot_click$x) != 1 ){
+          error_string <-"Please click on the Efficient Frontier"
+          return(error_string)
+        }
         
         min_distance <- (which(abs(X[1]-input$plot_click$y)==min(abs(X[1]-input$plot_click$y))))
         # Return the Variance on plot and the closest value to Expected Return Possible
