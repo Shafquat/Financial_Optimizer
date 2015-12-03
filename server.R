@@ -1,6 +1,8 @@
 library(shiny)
 library(quantmod)
 source("MVO.R")
+source("CVAR.R")
+source("MAD.R")
 require(tseries)
 library(fPortfolio)
 
@@ -48,13 +50,18 @@ shinyServer(function(input, output, session) {
       mylist <- lapply(stock_list2, function(x){
         try(getSymbols(x, src = 'yahoo', from = input$dates[1], to = input$dates[2], auto.assign = FALSE))
       })
-      
+      if (input$model == "MAD"){
+        # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
+        folio <- MAD(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate)
+      }else if(input$model == "CVAR"){
+        folio <- CVAR(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate, alpha = 0.05)
+      }else{
       # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
       folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate)
-      
+      }
       # outputs a chart
       output$plot1 <- renderPlot({
-        plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
+        plot(folio$vol, folio$ret, main = input$model, type = "l", xlab = "Variance", ylab = "Returns")
       })
       
       # Get Investment amount from weights
