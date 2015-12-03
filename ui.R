@@ -13,7 +13,7 @@ shinyUI(pageWithSidebar(
   headerPanel("Stock Optimization"),
   
   sidebarPanel(
-    radioButtons(inputId = "model", label = "Choose an optimization model", choices = c("MVO" = "MVO","MAD" = "MAD","CVAR" = "CVaR"), inline = TRUE),
+    radioButtons(inputId = "model", label = "Choose an optimization model", choices = c("MVO" = "MVO","MAD" = "MAD","CVaR" = "CVaR"), inline = TRUE),
 
     helpText("Please select stocks for your portfolio"),
 
@@ -28,6 +28,7 @@ shinyUI(pageWithSidebar(
                    "Please select the historic range",
                    start = Sys.Date()-365, end = Sys.Date()),
     
+    uiOutput("alpha_selection"),
     numericInput("investment_amount","Please enter Investment Amount", 10000, step = 1000, min = 0),
     numericInput("riskfree_rate","Please enter the risk free rate",0.05, step = 0.01),
     checkboxInput("short","Allow shorting",FALSE),

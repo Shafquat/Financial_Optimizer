@@ -17,7 +17,14 @@ textInputRow<-function (inputId, label, value = "")
 # Define server logic for random distribution application
 shinyServer(function(input, output, session) {
   
-  # Change default value of minimum portfolio to -1 if shorting is selected
+  # Add Alpha Slider if CVAR is picked
+    output$alpha_selection <- renderUI({
+      if(input$model == "CVaR"){
+      sliderInput(inputId = "alpha", label = "Select Alpha", min = 0.01, max = 0.1, value = 0.05, step = 0.01)
+      }
+    })
+  
+  # Change the number of new rows based on user input
   observe({
     num_stocks <- input$morestocks
     output$newrow <- renderUI({
@@ -25,6 +32,7 @@ shinyServer(function(input, output, session) {
         textInputRow(inputId = paste0("symb", i),"","")
       })
     })
+    
   })
   
   # get number of new stocks when button is pressed
@@ -53,8 +61,8 @@ shinyServer(function(input, output, session) {
       if (input$model == "MAD"){
         # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
         folio <- MAD(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate)
-      }else if(input$model == "CVAR"){
-        folio <- CVAR(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate, alpha = 0.05)
+      }else if(input$model == "CVaR"){
+        folio <- CVaR(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate, alpha = input$alpha)
       }else{
       # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
       folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate)
