@@ -14,7 +14,7 @@ textInputRow<-function (inputId, label, value = "")
 
 # Define server logic for random distribution application
 shinyServer(function(input, output, session) {
-
+  
   # Change default value of minimum portfolio to -1 if shorting is selected
   observe({
     num_stocks <- input$morestocks
@@ -24,12 +24,12 @@ shinyServer(function(input, output, session) {
       })
     })
   })
-
+  
   # get number of new stocks when button is pressed
   num_stocks_caller <- eventReactive(input$get, {
     input$morestocks
   })
-
+  
   # when button click, collate a list of stocks
   observeEvent(input$get, {
     observe({
@@ -43,15 +43,15 @@ shinyServer(function(input, output, session) {
           stock_list2[[length(stock_list2)+1]] <<- input[[paste0("symb", i)]]
         }
       })
-
+      
       #download data from yahoo finance
       mylist <- lapply(stock_list2, function(x){
         try(getSymbols(x, src = 'yahoo', from = input$dates[1], to = input$dates[2], auto.assign = FALSE))
       })
-
+      
       # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
       folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate)
-
+      
       # outputs a chart
       output$plot1 <- renderPlot({
         plot(folio$vol, folio$ret, main = "MVO", type = "l", xlab = "Variance", ylab = "Returns")
@@ -63,10 +63,7 @@ shinyServer(function(input, output, session) {
       X <- (data.frame(folio$ret,folio$weights))
       # Rename the headers of the first two columns of the data frame
       colnames(X)[1] <- "Expected Return"
-      # Round all the values in X to 4 digits beyond decimal
-      #is.num <- sapply(X, is.numeric)
-      #X[is.num] <- lapply(X[is.num], round, 4)
-
+      
       # gives coordinates on chart
       output$info <- renderText({
         if (length(input$plot_click$x) != 1 ){
@@ -76,17 +73,19 @@ shinyServer(function(input, output, session) {
         
         min_distance <- (which(abs(X[1]-input$plot_click$y)==min(abs(X[1]-input$plot_click$y))))
         # Return the Variance on plot and the closest value to Expected Return Possible
-        original_string <- paste0("Variance:", input$plot_click$x, #lapply(input$plot_click$x, round, 4), 
+        original_string <- paste0("Variance:", input$plot_click$x,
                                   "\nExpected Return:", X[[min_distance,1]],
                                   "\n" )
         for(i in 2:(ncol(X))){
           original_string <- paste0(original_string,colnames(X)[i], ": ", X[[min_distance, i]],"\n")
         }
         original_string
+      })
     })
+    
   })
   
-})
-  
-
+  session$onSessionEnded(function() {
+    stopApp()
+  })
 })
