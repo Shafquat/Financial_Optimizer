@@ -31,7 +31,6 @@ shinyUI(pageWithSidebar(
     numericInput("investment_amount","Please enter Investment Amount", 10000, step = 1000, min = 0),
     numericInput("riskfree_rate","Please enter the risk free rate",0.05, step = 0.01),
     checkboxInput("short","Allow shorting",FALSE),
-    numericInput("min_portfolio","Minimum weight amount per stock",0, step = 0.01, min = -1, max = 1),
     numericInput("max_portfolio","Maximum weight amount per stock",1, step = 0.01, min = -1, max = 1),
     
     actionButton("get", "Optimize!"),

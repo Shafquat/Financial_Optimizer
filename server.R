@@ -14,12 +14,6 @@ textInputRow<-function (inputId, label, value = "")
 
 # Define server logic for random distribution application
 shinyServer(function(input, output, session) {
-  
-  # Change default value of minimum portfolio to -1 if shorting is selected
-  observe({
-    c_box <- input$short
-    updateNumericInput(session,"min_portfolio",value = (c_box %% 2)*-1)
-  })
 
   # Change default value of minimum portfolio to -1 if shorting is selected
   observe({
@@ -56,7 +50,7 @@ shinyServer(function(input, output, session) {
       })
 
       # takes in the following parameters: list_of_stocks, input$riskfree_rate, input$short, input$min_portfolio, input$max_portfolio
-      folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = 1, nports = 20, shorts = input$short, rf = input$riskfree_rate)
+      folio <- MVO(ticker = stock_list2, mylist = mylist, wmax = input$max_portfolio, nports = 20, shorts = input$short, rf = input$riskfree_rate)
 
       # outputs a chart
       output$plot1 <- renderPlot({
@@ -70,8 +64,8 @@ shinyServer(function(input, output, session) {
       # Rename the headers of the first two columns of the data frame
       colnames(X)[1] <- "Expected Return"
       # Round all the values in X to 4 digits beyond decimal
-      is.num <- sapply(X, is.numeric)
-      X[is.num] <- lapply(X[is.num], round, 4)
+      #is.num <- sapply(X, is.numeric)
+      #X[is.num] <- lapply(X[is.num], round, 4)
 
       # gives coordinates on chart
       output$info <- renderText({
@@ -82,7 +76,7 @@ shinyServer(function(input, output, session) {
         
         min_distance <- (which(abs(X[1]-input$plot_click$y)==min(abs(X[1]-input$plot_click$y))))
         # Return the Variance on plot and the closest value to Expected Return Possible
-        original_string <- paste0("Variance:", lapply(input$plot_click$x, round, 4), 
+        original_string <- paste0("Variance:", input$plot_click$x, #lapply(input$plot_click$x, round, 4), 
                                   "\nExpected Return:", X[[min_distance,1]],
                                   "\n" )
         for(i in 2:(ncol(X))){
