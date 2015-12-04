@@ -1,7 +1,9 @@
 name: esc499-capstone-design
 account: shafquat
 server: shinyapps.io
-appId: 71915
-bundleId: 324035
+appId: 71972
+bundleId: 324249
 url: https://shafquat.shinyapps.io/esc499-capstone-design
-when: 1449161387.88662
+when: 1449183268.17673
+asMultiple: FALSE
+asStatic: FALSE

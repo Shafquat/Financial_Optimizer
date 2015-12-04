@@ -1,7 +1,7 @@
 library(shiny)
 library(quantmod)
 source("MVO.R")
-source("CVAR.R")
+source("CVaR.R")
 source("MAD.R")
 require(tseries)
 library(fPortfolio)
@@ -21,7 +21,7 @@ shinyServer(function(input, output, session) {
     output$alpha_selection <- renderUI({
       if(input$model == "CVaR"){
       sliderInput(inputId = "alpha", label = "Select Alpha", min = 0.01, max = 0.1, value = 0.05, step = 0.01)
-      }
+      } 
     })
   
   # Change the number of new rows based on user input
